@@ -29,9 +29,8 @@ class SignUpView(generics.CreateAPIView):
         )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
-            subject='Регистрация на сайте',
-            message=f'Вы успешно зарегистрировались на сайте. '
-                    f'Ваш код подтверждения: {confirmation_code}.',
+            subject='Получение кода подтверждения',
+            message=f'Ваш код подтверждения: {confirmation_code}.',
             from_email=settings.EMAIL_ADMIN,
             recipient_list=[user.email],
         )
