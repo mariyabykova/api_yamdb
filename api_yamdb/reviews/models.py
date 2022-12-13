@@ -51,7 +51,7 @@ class Title(models.Model):
     category = models.ForeignKey(
         Category,
         blank=False,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         related_name="titles",
         verbose_name="Slug категории",
     )
@@ -67,7 +67,7 @@ class Title(models.Model):
     )
     name = models.CharField(
         blank=False,
-        max_length=200,
+        max_length=256,
         verbose_name="Название",
     )
     year = models.IntegerField(
