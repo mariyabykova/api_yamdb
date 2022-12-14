@@ -4,8 +4,12 @@ from reviews.models import Comment, Review
 
 
 class SignUpSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
+    username = serializers.RegexField(
+        required=True,
+        regex=r'^[\w.@+-]+$',
+        max_length=150
+    )
+    email = serializers.EmailField(required=True, max_length=254)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
