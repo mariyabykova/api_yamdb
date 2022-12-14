@@ -2,6 +2,13 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+ROLE_CHOICES = (
+    ('user', 'user'),
+    ('admin', 'admin'),
+    ('moderator', 'moderator'),
+)
+
+
 class User(AbstractUser):
     username = models.CharField(
         'Имя пользователя',
@@ -16,9 +23,25 @@ class User(AbstractUser):
         blank=False,
         null=False,
     )
+    role = models.CharField(
+        'Роль',
+        max_length=50,
+        choices=ROLE_CHOICES,
+        default='user',
+    )
     bio = models.TextField(
         'Биография',
         blank=True,
+    )
+    first_name = models.CharField(
+        'Имя',
+        max_length=150,
+        blank=True,
+    )
+    last_name = models.CharField(
+        "Фамилия",
+        max_length=150,
+        blank=True
     )
 
     def __str__(self):

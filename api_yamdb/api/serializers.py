@@ -1,5 +1,11 @@
 from rest_framework import serializers
+
 from reviews.models import Comment, Review
+
+
+class SignUpSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
