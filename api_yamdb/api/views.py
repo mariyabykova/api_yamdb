@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.serializers import SignUpSerializer
+from api.serializers import SignUpSerializer, CommentSerializer, ReviewSerializer
 from users.models import User
 
 
@@ -35,3 +35,11 @@ class SignUpView(generics.CreateAPIView):
             recipient_list=[user.email],
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
