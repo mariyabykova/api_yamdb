@@ -52,7 +52,8 @@ class Genre(models.Model):
 class Title(models.Model):
     category = models.ForeignKey(
         Category,
-        blank=False,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
         related_name="titles",
         verbose_name="Slug категории",
@@ -74,7 +75,6 @@ class Title(models.Model):
     )
     year = models.IntegerField(
         blank=False,
-        max_length=4,
         verbose_name="Год выпуска",
     )
 
@@ -163,7 +163,6 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
         auto_now_add=True,
-        db_index=True
     )
 
     class Meta:
