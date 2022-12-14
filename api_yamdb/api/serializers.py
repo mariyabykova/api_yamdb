@@ -24,8 +24,6 @@ class SignUpSerializer(serializers.Serializer):
         return data
 
 
-
-
 class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
