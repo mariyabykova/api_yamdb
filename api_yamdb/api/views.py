@@ -47,10 +47,16 @@ class SignUpView(generics.CreateAPIView):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Получение/создание/обновление/удаление
+    отзыва к произведению
+    """
     serializer_class = ReviewSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Получение/создание/обновление/удаление
+    комментария к отзыву о произведении
+    """
     serializer_class = CommentSerializer
 
 
