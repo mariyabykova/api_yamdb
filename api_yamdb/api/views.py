@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
+from api.permissions import IsAdminOnly
 from api.serializers import (
     CategorySerializer,
     CommentSerializer,
@@ -15,7 +16,7 @@ from api.serializers import (
     ReviewSerializer,
     SignUpSerializer,
     TitleSerializer,
-    TokenSerializer,
+    TokenSerializer, UserSerializer,
 )
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
@@ -71,7 +72,13 @@ class TokenObtainView(generics.CreateAPIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    pass
+    """Управление пользователем.
+    Доступно для администраторов.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'username'
+    permission_classes = (IsAdminOnly,)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
