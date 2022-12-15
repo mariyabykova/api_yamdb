@@ -1,21 +1,18 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, status, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-
-from api.serializers import (
-    CategorySerializer,
-    CommentSerializer,
-    GenreSerializer,
-    ReviewSerializer,
-    SignUpSerializer,
-    TitleSerializer
-)
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
+
+from .permissions import IsModeratorOrReadOnly
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer, SignUpSerializer,
+                          TitleSerializer)
 
 
 class SignUpView(generics.CreateAPIView):
@@ -51,6 +48,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
     отзыва к произведению
     """
     serializer_class = ReviewSerializer
+    permission_classes = [IsModeratorOrReadOnly]
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        return serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
