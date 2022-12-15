@@ -70,6 +70,10 @@ class TokenObtainView(generics.CreateAPIView):
         )
 
 
+class UserViewSet(viewsets.ModelViewSet):
+    pass
+
+
 class ReviewViewSet(viewsets.ModelViewSet):
     """Получение/создание/обновление/удаление
     отзыва к произведению

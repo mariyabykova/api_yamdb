@@ -7,7 +7,9 @@ from api.views import (
     GenreViewSet,
     ReviewViewSet,
     SignUpView,
-    TitleViewSet, TokenObtainView
+    TitleViewSet,
+    TokenObtainView,
+    UserViewSet
 )
 
 
@@ -15,6 +17,7 @@ router = DefaultRouter()
 router.register("categories", CategoryViewSet, basename="category")
 router.register("genres", GenreViewSet, basename="genre")
 router.register("titles", TitleViewSet, basename="title")
+router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('v1/auth/signup/', SignUpView.as_view()),
