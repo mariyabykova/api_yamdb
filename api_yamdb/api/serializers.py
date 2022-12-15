@@ -27,8 +27,13 @@ class SignUpSerializer(serializers.Serializer):
         return data
 
 
-class TokenObrainSerializer(serializers.Serializer):
-    pass
+class TokenSerializer(serializers.Serializer):
+    username = serializers.RegexField(
+        required=True,
+        regex=r'^[\w.@+-]+$',
+        max_length=150
+    )
+    confirmation_code = serializers.CharField(required=True)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
