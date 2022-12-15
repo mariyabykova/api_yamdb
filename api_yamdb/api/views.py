@@ -1,17 +1,18 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from rest_framework import generics, status, viewsets
-from rest_framework.pagination import PageNumberPagination
+from rest_framework import filters, generics, status, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
+from api.permissions import IsAdminOrReadOnly
 from api.serializers import (
     CategorySerializer,
     CommentSerializer,
     GenreSerializer,
     ReviewSerializer,
     SignUpSerializer,
+    TitleListSerializer,
     TitleSerializer
 )
 from reviews.models import Category, Comment, Genre, Review, Title
@@ -61,22 +62,39 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    """Получение списка всех категорий.
+    Создание/удаление категории.
+    """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
     lookup_field = 'slug'
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
+    """Получение списка всех жанров.
+    Создание/удаление жанра.
+    """
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """Получение списка всех произведений.
+    Получение информации о конкретном произведении.
+    Создание/обновление/удаление произведения.
+    """
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = PageNumberPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    # search_fields = ('category__slug',)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return TitleListSerializer
+        return TitleSerializer
