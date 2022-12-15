@@ -27,6 +27,10 @@ class SignUpSerializer(serializers.Serializer):
         return data
 
 
+class TokenObrainSerializer(serializers.Serializer):
+    pass
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         default=serializers.CurrentUserDefault(),

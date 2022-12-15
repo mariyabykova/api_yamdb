@@ -46,6 +46,10 @@ class SignUpView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class TokenObtainView(generics.CreateAPIView):
+    pass
+
+
 class ReviewViewSet(viewsets.ModelViewSet):
     """Получение/создание/обновление/удаление
     отзыва к произведению

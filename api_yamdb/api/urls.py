@@ -7,7 +7,7 @@ from api.views import (
     GenreViewSet,
     ReviewViewSet,
     SignUpView,
-    TitleViewSet
+    TitleViewSet, TokenObtainView
 )
 
 
@@ -18,5 +18,6 @@ router.register("titles", TitleViewSet, basename="title")
 
 urlpatterns = [
     path('v1/auth/signup/', SignUpView.as_view()),
+    path('v1/auth/token/', TokenObtainView.as_view()),
     path("v1/", include(router.urls)),
 ]
