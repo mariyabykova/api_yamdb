@@ -52,6 +52,20 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
 
 
+class UserMeSerializer(serializers.ModelSerializer):
+    username = serializers.RegexField(
+        required=True,
+        regex=r'^[\w.@+-]+$',
+        max_length=150,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
+        read_only_fields = ('role',)
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
