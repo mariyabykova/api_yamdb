@@ -4,10 +4,12 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-
 from rest_framework import filters, generics, status, viewsets
 from rest_framework import generics, status, viewsets
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -24,9 +26,15 @@ from api.serializers import (
     TitleSerializer,
     TokenSerializer,
     UserSerializer,
+    UserMeSerializer,
 )
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
+from .permissions import IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer, SignUpSerializer,
+                          TitleListSerializer, TitleSerializer,
+                          TokenSerializer, UserSerializer)
 
 
 class SignUpView(generics.CreateAPIView):
@@ -86,6 +94,32 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     lookup_field = 'username'
     permission_classes = (IsAdminOnly,)
+    pagination_class = PageNumberPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=username',)
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+    @action(
+        detail=False,
+        methods=['get', 'patch'],
+        permission_classes=[IsAuthenticated],
+        url_path='me'
+    )
+    def edit_profile(self, request):
+        """Редактирование собственной страницы.
+        Доступно для аутентифицированных пользователей.
+        Роль пользователя изменить нельзя."""
+        if request.method == 'PATCH':
+            serializer = UserMeSerializer(
+                self.request.user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = UserMeSerializer(self.request.user)
+        return Response(serializer.data)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -93,7 +127,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     отзыва к произведению
     """
     serializer_class = ReviewSerializer
-    permission_classes = [IsModeratorOrReadOnly]
+    permission_classes = (IsModeratorOrReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -109,17 +143,17 @@ class CommentViewSet(viewsets.ModelViewSet):
     комментария к отзыву о произведении
     """
     serializer_class = CommentSerializer
-    permission_classes = [IsModeratorOrReadOnly]
+    permission_classes = (IsModeratorOrReadOnly,)
 
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
-        return Comment.objects.filter(title=title, review=review).all()
+        return review.comments.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
-        serializer.save(author=self.request.user, title=title, review=review)
+        review = get_object_or_404(Review,
+                                   id=self.kwargs.get('review_id'),
+                                   title_id=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, review=review)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -156,6 +190,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action in ('list', 'retrieve'):
             return TitleListSerializer
         return TitleSerializer
