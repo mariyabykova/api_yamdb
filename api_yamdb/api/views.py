@@ -5,36 +5,19 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status, viewsets
-from rest_framework import generics, status, viewsets
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from api.filters import TitleFilter
-from api.permissions import (
-    IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly)
-from api.serializers import (
-    CategorySerializer,
-    CommentSerializer,
-    GenreSerializer,
-    ReviewSerializer,
-    SignUpSerializer,
-    TitleListSerializer,
-    TitleSerializer,
-    TokenSerializer,
-    UserSerializer,
-    UserMeSerializer,
-)
-from reviews.models import Category, Comment, Genre, Review, Title
+from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from .permissions import IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
                           TitleListSerializer, TitleSerializer,
-                          TokenSerializer, UserSerializer)
+                          TokenSerializer, UserSerializer, UserMeSerializer)
 
 
 class SignUpView(generics.CreateAPIView):
