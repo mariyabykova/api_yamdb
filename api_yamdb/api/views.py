@@ -4,9 +4,9 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 
 from rest_framework import filters, generics, status, viewsets
-from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -20,7 +20,7 @@ from api.serializers import (
     TitleListSerializer,
     TitleSerializer,
     TokenSerializer,
-    UserSerializer,
+    UserSerializer, UserMeSerializer,
 )
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
