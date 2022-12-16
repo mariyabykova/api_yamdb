@@ -2,7 +2,6 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator
-
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
@@ -59,14 +58,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
-    def validate(self, data):
-        if self.context['request'].method == 'POST':
-            user = self.context['request'].user
-            title_id = self.context['view'].kwargs.get('title_id')
-            if Review.objects.filter(author=user, title_id=title_id).exists():
-                raise serializers.ValidationError('Вы уже оставили отзыв.')
-        return data
-
     class Meta:
         model = Review
         fields = (
@@ -76,6 +67,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id', 'author', 'pub_date',
         )
+
+    def validate(self, data):
+        if self.context['request'].method == 'POST':
+            user = self.context['request'].user
+            title_id = self.context['view'].kwargs.get('title_id')
+            if Review.objects.filter(author=user, title_id=title_id).exists():
+                raise serializers.ValidationError('Вы уже оставили отзыв.')
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -93,7 +92,7 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id', 'author', 'pub_date',
         )
-        
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
