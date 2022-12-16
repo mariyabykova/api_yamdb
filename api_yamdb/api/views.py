@@ -88,6 +88,18 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('=username',)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
+    @action(
+        detail=False,
+        methods=['get', 'patch'],
+        permission_classes=[IsAuthenticated],
+        url_path='me'
+    )
+    def edit_profile(self, request):
+        """Редактирование собственной страницы.
+        Доступно для аутентифицированных пользователей.
+        Роль пользователя изменить нельзя."""
+        pass
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Получение/создание/обновление/удаление
