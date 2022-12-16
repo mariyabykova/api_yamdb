@@ -20,11 +20,14 @@ class SignUpSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 'Недопустимое имя пользователя!'
             )
-        if User.objects.filter(username=data['username'], email=data['email']).exists():
+        if User.objects.filter(username=data['username'],
+                               email=data['email']).exists():
             return data
         if (User.objects.filter(username=data['username']).exists()
                 or User.objects.filter(email=data['email']).exists()):
-            raise serializers.ValidationError('Пользователь с такими данными уже существует!')
+            raise serializers.ValidationError(
+                'Пользователь с такими данными уже существует!'
+            )
         return data
 
 
@@ -95,14 +98,14 @@ class CommentSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ('name', 'slug')
         lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = '__all__'
+        fields = ('name', 'slug')
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -115,9 +118,21 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
         slug_field='slug'
     )
-    rating = serializers.IntegerField(required=False)
 
     class Meta:
         model = Title
         fields = '__all__'
 
+
+class TitleListSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
+    rating = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = Title
+        fields = (
+            'id', 'name', 'year', 'rating',
+            'description', 'genre', 'category'
+        )
+        read_only_fields = ('id', 'rating')
