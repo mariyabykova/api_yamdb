@@ -148,4 +148,3 @@ class TitleListSerializer(serializers.ModelSerializer):
             'id', 'name', 'year', 'rating',
             'description', 'genre', 'category'
         )
-        read_only_fields = ('id', 'rating')

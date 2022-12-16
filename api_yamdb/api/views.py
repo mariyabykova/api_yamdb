@@ -1,20 +1,21 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.db.models.aggregates import Avg
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from api.permissions import IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly
+from api.filters import TitleFilter
+from api.permissions import (
+    IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly)
 from api.serializers import (
     CategorySerializer,
     CommentSerializer,
@@ -183,10 +184,10 @@ class TitleViewSet(viewsets.ModelViewSet):
     Получение информации о конкретном произведении.
     Создание/обновление/удаление произведения.
     """
-    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
-    # search_fields = ('category__slug',)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
