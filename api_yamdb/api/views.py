@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -20,7 +19,8 @@ from api.serializers import (
     TitleListSerializer,
     TitleSerializer,
     TokenSerializer,
-    UserSerializer, UserMeSerializer,
+    UserSerializer,
+    UserMeSerializer,
 )
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
@@ -98,7 +98,17 @@ class UserViewSet(viewsets.ModelViewSet):
         """Редактирование собственной страницы.
         Доступно для аутентифицированных пользователей.
         Роль пользователя изменить нельзя."""
-        pass
+        if request.method == 'PATCH':
+            serializer = UserMeSerializer(
+                self.request.user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = UserMeSerializer(self.request.user)
+        return Response(serializer.data)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
