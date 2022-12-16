@@ -1,11 +1,16 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+
 from rest_framework import filters, generics, status, viewsets
+from rest_framework import generics, status, viewsets
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
 
-from api.permissions import IsAdminOrReadOnly
+from api.permissions import IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly
 from api.serializers import (
     CategorySerializer,
     CommentSerializer,
@@ -13,7 +18,9 @@ from api.serializers import (
     ReviewSerializer,
     SignUpSerializer,
     TitleListSerializer,
-    TitleSerializer
+    TitleSerializer,
+    TokenSerializer,
+    UserSerializer,
 )
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
@@ -47,11 +54,51 @@ class SignUpView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class TokenObtainView(generics.CreateAPIView):
+    """Получение токена по имени пользователя и коду подтверждения."""
+    queryset = User.objects.all()
+    serializer_class = TokenSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = TokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        username = serializer.data.get('username')
+        confirmation_code = serializer.data.get('confirmation_code')
+        user = get_object_or_404(User, username=username)
+        if default_token_generator.check_token(user, confirmation_code):
+            token = AccessToken.for_user(user)
+            return Response({'token': f'{token}'}, status.HTTP_200_OK)
+        return Response(
+            {'message': 'Неверный код подтверждения.'},
+            status.HTTP_400_BAD_REQUEST
+        )
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """Управление пользователем.
+    Доступно для администраторов.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'username'
+    permission_classes = (IsAdminOnly,)
+
+
 class ReviewViewSet(viewsets.ModelViewSet):
     """Получение/создание/обновление/удаление
     отзыва к произведению
     """
     serializer_class = ReviewSerializer
+    permission_classes = [IsModeratorOrReadOnly]
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -59,6 +106,17 @@ class CommentViewSet(viewsets.ModelViewSet):
     комментария к отзыву о произведении
     """
     serializer_class = CommentSerializer
+    permission_classes = [IsModeratorOrReadOnly]
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        return Comment.objects.filter(title=title, review=review).all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, title=title, review=review)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
