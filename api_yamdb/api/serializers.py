@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
+from rest_framework.validators import UniqueValidator
+
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
@@ -24,6 +26,28 @@ class SignUpSerializer(serializers.Serializer):
                 or User.objects.filter(email=data['email']).exists()):
             raise serializers.ValidationError('Пользователь с такими данными уже существует!')
         return data
+
+
+class TokenSerializer(serializers.Serializer):
+    username = serializers.RegexField(
+        required=True,
+        regex=r'^[\w.@+-]+$',
+        max_length=150
+    )
+    confirmation_code = serializers.CharField(required=True)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.RegexField(
+        required=True,
+        regex=r'^[\w.@+-]+$',
+        max_length=150,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
