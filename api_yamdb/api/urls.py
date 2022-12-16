@@ -12,11 +12,16 @@ from api.views import (
     UserViewSet
 )
 
-
 router = DefaultRouter()
+
 router.register("categories", CategoryViewSet, basename="category")
 router.register("genres", GenreViewSet, basename="genre")
 router.register("titles", TitleViewSet, basename="title")
+router.register(r'titles/(?P<title_id>\d+)/reviews',
+                ReviewViewSet, basename='reviews')
+router.register(r'titles/(?P<title_id>\d+)/reviews'
+                r'/(?P<review_id>\d+/coments)',
+                CommentViewSet, basename='comments')
 router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [

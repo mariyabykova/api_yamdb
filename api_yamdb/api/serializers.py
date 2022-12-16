@@ -52,20 +52,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        default=serializers.CurrentUserDefault(),
         slug_field='username',
         read_only=True
     )
 
     def validate(self, data):
-        request = self.context['request']
-        author = request.user
-        title_id = self.context['view'].kwargs.get['title_id']
-        title = get_object_or_404(Title, pk=title_id)
-        if request.method == 'POST':
-            if Review.objects.filter(title=title, author=author):
-                raise ValidationError('Вы уже оставили отзыв '
-                                      'на данное произведение')
+        if self.context['request'].method == 'POST':
+            user = self.context['request'].user
+            title_id = self.context['view'].kwargs.get('title_id')
+            if Review.objects.filter(author=user, title_id=title_id).exists():
+                raise serializers.ValidationError('Вы уже оставили отзыв.')
         return data
 
     class Meta:

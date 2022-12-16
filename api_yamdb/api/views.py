@@ -16,10 +16,16 @@ from api.serializers import (
     ReviewSerializer,
     SignUpSerializer,
     TitleSerializer,
-    TokenSerializer, UserSerializer,
+    TokenSerializer,
+    UserSerializer,
 )
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
+
+from .permissions import IsModeratorOrReadOnly
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer, SignUpSerializer,
+                          TitleSerializer)
 
 
 class SignUpView(generics.CreateAPIView):
@@ -86,6 +92,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
     отзыва к произведению
     """
     serializer_class = ReviewSerializer
+    permission_classes = [IsModeratorOrReadOnly]
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -93,6 +108,17 @@ class CommentViewSet(viewsets.ModelViewSet):
     комментария к отзыву о произведении
     """
     serializer_class = CommentSerializer
+    permission_classes = [IsModeratorOrReadOnly]
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        return Comment.objects.filter(title=title, review=review).all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, title=title, review=review)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
