@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'reviews.apps.ReviewsConfig',
     'api.apps.ApiConfig',
+    'django_filters',
+    'import_export'
 ]
 
 MIDDLEWARE = [
@@ -104,7 +106,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
