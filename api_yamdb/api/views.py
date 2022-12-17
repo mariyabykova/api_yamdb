@@ -75,7 +75,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """Управление пользователем.
     Доступно для администраторов.
     """
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     lookup_field = 'username'
     permission_classes = (IsAdminOnly,)
@@ -169,7 +169,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     Получение информации о конкретном произведении.
     Создание/обновление/удаление произведения.
     """
-    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')).order_by('id')
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
