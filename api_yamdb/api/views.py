@@ -4,17 +4,16 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins
-from rest_framework import generics, status, viewsets
+from rest_framework import filters, generics, status, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from .filters import TitleFilter
+from .mixins import ListCreateDestroyViewSet
 from .permissions import IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
@@ -140,10 +139,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
 
-class CategoryViewSet(mixins.CreateModelMixin,
-                      mixins.DestroyModelMixin,
-                      mixins.ListModelMixin,
-                      GenericViewSet):
+class CategoryViewSet(ListCreateDestroyViewSet):
     """Получение списка всех категорий.
     Создание/удаление категории.
     """
@@ -155,10 +151,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     search_fields = ('name',)
 
 
-class GenreViewSet(mixins.CreateModelMixin,
-                   mixins.DestroyModelMixin,
-                   mixins.ListModelMixin,
-                   GenericViewSet):
+class GenreViewSet(ListCreateDestroyViewSet):
     """Получение списка всех жанров.
     Создание/удаление жанра.
     """
@@ -168,6 +161,7 @@ class GenreViewSet(mixins.CreateModelMixin,
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -175,9 +169,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     Получение информации о конкретном произведении.
     Создание/обновление/удаление произведения.
     """
-    queryset = (
-        Title.objects.annotate(rating=Avg('reviews__score')).order_by('id')
-    )
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')).order_by('-id')
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
