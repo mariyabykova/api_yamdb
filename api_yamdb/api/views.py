@@ -4,37 +4,22 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, status, viewsets
-from rest_framework import generics, status, viewsets
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
+from rest_framework import filters, generics, status, viewsets, mixins
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from api.filters import TitleFilter
-from api.permissions import (
-    IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly)
-from api.serializers import (
-    CategorySerializer,
-    CommentSerializer,
-    GenreSerializer,
-    ReviewSerializer,
-    SignUpSerializer,
-    TitleListSerializer,
-    TitleSerializer,
-    TokenSerializer,
-    UserSerializer,
-    UserMeSerializer,
-)
-from reviews.models import Category, Comment, Genre, Review, Title
+from reviews.models import Category, Genre, Review, Title
 from users.models import User
+from .mixins import ListCreateDestroyViewSet
 from .permissions import IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
                           TitleListSerializer, TitleSerializer,
-                          TokenSerializer, UserSerializer)
+                          TokenSerializer, UserSerializer, UserMeSerializer)
 
 
 class SignUpView(generics.CreateAPIView):
@@ -90,11 +75,10 @@ class UserViewSet(viewsets.ModelViewSet):
     """Управление пользователем.
     Доступно для администраторов.
     """
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('-id')
     serializer_class = UserSerializer
     lookup_field = 'username'
     permission_classes = (IsAdminOnly,)
-    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('=username',)
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -156,7 +140,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(ListCreateDestroyViewSet):
     """Получение списка всех категорий.
     Создание/удаление категории.
     """
@@ -168,7 +152,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(ListCreateDestroyViewSet):
     """Получение списка всех жанров.
     Создание/удаление жанра.
     """
@@ -177,6 +161,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -184,7 +169,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     Получение информации о конкретном произведении.
     Создание/обновление/удаление произведения.
     """
-    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')).order_by('-id')
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
