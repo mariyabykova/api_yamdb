@@ -2,6 +2,9 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from django.conf.global_settings import DATETIME_INPUT_FORMATS
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -28,6 +31,7 @@ INSTALLED_APPS = [
     'reviews.apps.ReviewsConfig',
     'api.apps.ApiConfig',
     'django_filters',
+    'import_export'
 ]
 
 MIDDLEWARE = [
@@ -105,7 +109,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
@@ -131,3 +137,5 @@ SIMPLE_JWT = {
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 EMAIL_ADMIN = 'admin@yamdb.ru'
+
+DATETIME_INPUT_FORMATS += ('%Y-%m-%dT%H:%M:%S.%f%z',)
