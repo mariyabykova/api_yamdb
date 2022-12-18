@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, status, viewsets, mixins
+from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -24,7 +24,8 @@ from .serializers import (CategorySerializer, CommentSerializer,
 class SignUpView(generics.CreateAPIView):
     """Регистрация нового пользователя по username и email.
     На электронную почту пользователю отправляется
-    код подтверждения.
+    код подтверждения. Если пользователь уже зарегистрирован,
+    он получает обновлённый код подтверждения.
     """
     queryset = User.objects.all()
     serializer_class = SignUpSerializer

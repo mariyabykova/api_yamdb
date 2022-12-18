@@ -19,10 +19,10 @@ class CategoryResource(resources.ModelResource):
 class CategoryAdmin(ImportExportModelAdmin):
     resource_classes = (CategoryResource,)
     list_display = (
-            'id',
-            'name',
-            'slug',
-        )
+        'id',
+        'name',
+        'slug',
+    )
 
 
 class GenreResource(resources.ModelResource):
@@ -38,10 +38,10 @@ class GenreResource(resources.ModelResource):
 class GenreAdmin(ImportExportModelAdmin):
     resource_classes = (GenreResource,)
     list_display = (
-            'id',
-            'name',
-            'slug',
-        )
+        'id',
+        'name',
+        'slug',
+    )
 
 
 class TitleResource(resources.ModelResource):
@@ -58,11 +58,11 @@ class TitleResource(resources.ModelResource):
 class TitleAdmin(ImportExportModelAdmin):
     resource_classes = (TitleResource,)
     list_display = (
-            'id',
-            'name',
-            'year',
-            'category'
-        )
+        'id',
+        'name',
+        'year',
+        'category'
+    )
 
 
 class TitleGenreResource(resources.ModelResource):
@@ -105,13 +105,13 @@ class ReviewResource(resources.ModelResource):
 class ReviewAdmin(ImportExportModelAdmin):
     resource_classes = (ReviewResource,)
     list_display = (
-            'id',
-            'title',
-            'text',
-            'author',
-            'score',
-            'pub_date',
-        )
+        'id',
+        'title',
+        'text',
+        'author',
+        'score',
+        'pub_date',
+    )
 
 
 class CommentResource(resources.ModelResource):
@@ -131,12 +131,12 @@ class CommentResource(resources.ModelResource):
 class CommentAdmin(ImportExportModelAdmin):
     resource_classes = (CommentResource,)
     list_display = (
-            'id',
-            'review',
-            'text',
-            'author',
-            'pub_date',
-        )
+        'id',
+        'review',
+        'text',
+        'author',
+        'pub_date',
+    )
 
 
 admin.site.register(Category, CategoryAdmin)

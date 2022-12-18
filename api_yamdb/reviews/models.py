@@ -96,6 +96,10 @@ class TitleGenre(models.Model):
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        verbose_name = 'Произведения и жанры'
+        verbose_name_plural = 'Произведения и жанры'
+
     def __str__(self):
         return f'{self.title} {self.genre}'
 

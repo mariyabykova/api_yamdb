@@ -22,14 +22,14 @@ class UserResource(resources.ModelResource):
 class UserAdmin(ImportExportModelAdmin):
     resource_classes = (UserResource,)
     list_display = (
-            'id',
-            'username',
-            'email',
-            'role',
-            'bio',
-            'first_name',
-            'last_name',
-        )
+        'id',
+        'username',
+        'email',
+        'role',
+        'bio',
+        'first_name',
+        'last_name',
+    )
 
 
 admin.site.register(User, UserAdmin)
