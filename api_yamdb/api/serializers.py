@@ -2,21 +2,18 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
+from users.validators import validate_username
 
 
 class SignUpSerializer(serializers.Serializer):
-    username = serializers.RegexField(
+    username = serializers.CharField(
         required=True,
-        regex=r'^[\w.@+-]+$',
-        max_length=150
+        max_length=150,
+        validators=[validate_username, ]
     )
     email = serializers.EmailField(required=True, max_length=254)
 
     def validate(self, data):
-        if data['username'] == 'me':
-            raise serializers.ValidationError(
-                'Недопустимое имя пользователя!'
-            )
         if User.objects.filter(username=data['username'],
                                email=data['email']).exists():
             return data
@@ -29,20 +26,20 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class TokenSerializer(serializers.Serializer):
-    username = serializers.RegexField(
+    username = serializers.CharField(
         required=True,
-        regex=r'^[\w.@+-]+$',
-        max_length=150
+        max_length=150,
+        validators=[validate_username, ]
     )
     confirmation_code = serializers.CharField(required=True)
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.RegexField(
+    username = serializers.CharField(
         required=True,
-        regex=r'^[\w.@+-]+$',
         max_length=150,
-        validators=[UniqueValidator(queryset=User.objects.all())],
+        validators=[validate_username,
+                    UniqueValidator(queryset=User.objects.all())]
     )
 
     class Meta:
@@ -54,11 +51,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserMeSerializer(serializers.ModelSerializer):
-    username = serializers.RegexField(
+    username = serializers.CharField(
         required=True,
-        regex=r'^[\w.@+-]+$',
         max_length=150,
-        validators=[UniqueValidator(queryset=User.objects.all())],
+        validators=[validate_username,
+                    UniqueValidator(queryset=User.objects.all())]
     )
 
     class Meta:
