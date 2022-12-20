@@ -75,10 +75,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = (
-            'id', 'text', 'author',
-            'score', 'pub_date',
-        )
+        exclude = ['title']
         read_only_fields = (
             'id', 'author', 'pub_date',
         )
@@ -100,10 +97,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = (
-            'id', 'text', 'author',
-            'pub_date',
-        )
+        exclude = ['review']
         read_only_fields = (
             'id', 'author', 'pub_date',
         )
@@ -112,14 +106,14 @@ class CommentSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('name', 'slug')
+        exclude = ['id']
         lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = ('name', 'slug')
+        exclude = ['id']
         lookup_field = 'slug'
 
 
@@ -146,7 +140,7 @@ class TitleListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = (
+        fields = [
             'id', 'name', 'year', 'rating',
             'description', 'genre', 'category'
-        )
+        ]

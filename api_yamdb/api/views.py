@@ -6,15 +6,17 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
+
 from .filters import TitleFilter
 from .mixins import ListCreateDestroyViewSet
-from .permissions import IsAdminOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly
+from .permissions import (IsAdminAuthorModeratorOrReadOnly, IsAdminOnly,
+                          IsAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
                           TitleListSerializer, TitleSerializer,
@@ -111,7 +113,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
     отзыва к произведению
     """
     serializer_class = ReviewSerializer
-    permission_classes = (IsModeratorOrReadOnly,)
+    permission_classes = (IsAdminAuthorModeratorOrReadOnly,
+                          IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -127,7 +130,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     комментария к отзыву о произведении
     """
     serializer_class = CommentSerializer
-    permission_classes = (IsModeratorOrReadOnly,)
+    permission_classes = (IsAdminAuthorModeratorOrReadOnly,
+                          IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
