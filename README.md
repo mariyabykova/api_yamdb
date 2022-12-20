@@ -119,13 +119,13 @@ python3 manage.py runserver
 * С помощью management-команд. Для этого из корневой директории проекта выполните команду:
 
 ```
-python3 manage.py load_universal_data --path <путь к csv-файлу> --model_name <имя модели> --app_name <название приложения>
+python3 manage.py load_data_csv --path <путь к csv-файлу> --model_name <имя модели> --app_name <название приложения>
 ```
 
 Например, для импорта данных о пользователях из файла 'users.csv' команда будет следующей:
 
 ```
-python3 manage.py load_universal_data --path static/data/users.csv --model_name user --app_name users
+python3 manage.py load_data_csv --path static/data/users.csv --model_name user --app_name users
 ```
 
 Данные из файлов необходимо загружать в следующем порядке:
