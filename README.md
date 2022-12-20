@@ -79,7 +79,7 @@ python3 -m venv venv
 * Если у вас Linux/macOS
 
     ```
-    source env/bin/activate
+    source venv/bin/activate
     ```
 
 * Если у вас windows
@@ -110,6 +110,26 @@ python3 manage.py migrate
 python3 manage.py runserver
 ```
 ----
+
+### Как импортировать данные из csv-файлов в базу данных
+
+Предусмотрены два способа загрузки данных из csv-файлов:
+
+* Через админ-панель (использована библиотека django-import-export).
+* С помощью management-команд. Для этого из корневой директории проекта выполните команду:
+
+```
+python3 manage.py <название файла с management-командой> --path <путь к csv-файлу>
+```
+
+Например, для импорта данных о пользователях из файла 'users.csv' команда будет следующей:
+
+```
+python3 manage.py load_user_data --path static/data/users.csv
+```
+
+----
+
 ### Авторы проекта
 
 **Мария Быкова.** Тимлид. Регистрация и авторизация, управление пользователями, права доступа.
