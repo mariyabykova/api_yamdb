@@ -44,9 +44,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ['id', 'date_joined', 'groups',
-                   'is_active', 'is_staff', 'is_superuser',
-                   'last_login', 'password', 'user_permissions']
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role'
+        )
 
 
 class UserMeSerializer(serializers.ModelSerializer):
@@ -59,9 +60,10 @@ class UserMeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ['id', 'date_joined', 'groups',
-                   'is_active', 'is_staff', 'is_superuser',
-                   'last_login', 'password', 'user_permissions']
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role'
+        )
         read_only_fields = ('role',)
 
 
