@@ -7,7 +7,7 @@ from ...models import Category, Title
 
 
 class Command(BaseCommand):
-    help = 'Load a titles csv file into the database'
+    help = 'Load titles csv file into the database'
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str)

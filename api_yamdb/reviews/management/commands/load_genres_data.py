@@ -6,7 +6,7 @@ from ...models import Genre
 
 
 class Command(BaseCommand):
-    help = 'Load a genres csv file into the database'
+    help = 'Load genres csv file into the database'
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str)

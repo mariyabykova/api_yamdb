@@ -1,12 +1,13 @@
 import csv
 
 from django.core.management import BaseCommand
+from django.shortcuts import get_object_or_404
 
-from ...models import Category
+from ...models import Comment, Review, User
 
 
 class Command(BaseCommand):
-    help = 'Load a categories csv file into the database'
+    help = 'Load comments csv file into the database'
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str)
@@ -17,8 +18,10 @@ class Command(BaseCommand):
             reader = csv.reader(file)
             next(reader)
             for row in reader:
-                Category.objects.get_or_create(
+                Comment.objects.create(
                     id=row[0],
-                    name=row[1],
-                    slug=row[2],
+                    review=get_object_or_404(Review, pk=row[1]),
+                    text=row[2],
+                    author=get_object_or_404(User, pk=row[3]),
+                    pub_date=row[4],
                 )

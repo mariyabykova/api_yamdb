@@ -1,12 +1,13 @@
 import csv
 
 from django.core.management import BaseCommand
+from django.shortcuts import get_object_or_404
 
-from ...models import Category
+from ...models import Genre, Title, TitleGenre
 
 
 class Command(BaseCommand):
-    help = 'Load a categories csv file into the database'
+    help = 'Load titles_genres csv file into the database'
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str)
@@ -17,8 +18,8 @@ class Command(BaseCommand):
             reader = csv.reader(file)
             next(reader)
             for row in reader:
-                Category.objects.get_or_create(
+                TitleGenre.objects.create(
                     id=row[0],
-                    name=row[1],
-                    slug=row[2],
+                    title=get_object_or_404(Title, pk=row[1]),
+                    genre=get_object_or_404(Genre, pk=row[2]),
                 )
