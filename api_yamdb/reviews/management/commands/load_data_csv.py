@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from reviews.models import Comment, Category, Genre, Title, TitleGenre, Review
 from users.models import User
 
+
 MODELS_FIELDS = {
     'category': Category,
     'genre': Genre,
@@ -15,7 +16,6 @@ MODELS_FIELDS = {
     'author': User,
     'review': Review,
 }
-
 
 DEFAULT_DATASET = OrderedDict({
     'users.csv': User,
@@ -26,7 +26,6 @@ DEFAULT_DATASET = OrderedDict({
     'review.csv': Review,
     'comments.csv': Comment,
 })
-
 
 DEFAULT_DATASET_PATH = 'static/data/'
 
